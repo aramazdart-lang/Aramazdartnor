@@ -35,13 +35,41 @@ function renderDashboard(){
  const active=userOrders.filter(o=>!String(o.status||'').includes('Ավարտ')&&!String(o.status||'').includes('Առաք'));
  const done=userOrders.length-active.length;
  const debt=userOrders.reduce((s,o)=>s+remaining(o),0);
+
  document.getElementById('statAll').textContent=userOrders.length;
  document.getElementById('statActive').textContent=active.length;
  document.getElementById('statDone').textContent=done;
  document.getElementById('statDebt').textContent=money(debt);
+
  const latest=userOrders[0];
- document.getElementById('activeOrderBox').innerHTML= latest ? `<div class="order-head"><div><h3>${latest.product}</h3><p>Պատվեր #AA-${latest.id} • ${latest.status||'Նոր պատվեր'}</p></div><span class="badge yellow">${latest.status||'Նոր պատվեր'}</span></div>${timeline(latest.status)}` : '<p>Դեռ պատվերներ չկան։</p>';
- document.getElementById('paymentBox').innerHTML= latest ? `<div class="pay-line"><span>Ընդհանուր</span><b>${money(latest.price)}</b></div><div class="pay-line"><span>Վճարված</span><b>${money(latest.paid_amount)}</b></div><div class="pay-line"><span>Մնացած</span><b>${money(remaining(latest))}</b></div><button onclick="alert('Իրական VPOS/Idram վճարումը կկցվի հաջորդ փուլում։')">Վճարել մնացածը</button>` : '<p>Վճարում չկա։</p>';
+
+ document.getElementById('activeOrderBox').innerHTML = latest ? `
+   <div class="order-head">
+     <div>
+       <h3>${latest.product}</h3>
+       <p>Պատվեր #AA-${latest.id} • ${latest.status || 'Նոր պատվեր'}</p>
+     </div>
+     <span class="badge yellow">${latest.status || 'Նոր պատվեր'}</span>
+   </div>
+
+   ${timeline(latest.status)}
+
+   <div class="pay-line">
+     <span>Վճարման վիճակ</span>
+     <b>${latest.payment_status || 'Չհաստատված'}</b>
+   </div>
+ ` : '<p>Դեռ պատվերներ չկան։</p>';
+
+ document.getElementById('paymentBox').innerHTML = latest ? `
+   <div class="pay-line"><span>Ընդհանուր</span><b>${money(latest.price)}</b></div>
+   <div class="pay-line"><span>Կանխավճար</span><b>${money(latest.deposit_amount)}</b></div>
+   <div class="pay-line"><span>Վճարված</span><b>${money(latest.paid_amount)}</b></div>
+   <div class="pay-line"><span>Մնացած</span><b>${money(remaining(latest))}</b></div>
+   <div class="pay-line"><span>Վճարման կարգավիճակ</span><b>${latest.payment_status || 'Չհաստատված'}</b></div>
+   <button onclick="alert('Իրական IDBank/Idram վճարումը կկցվի հաջորդ փուլում։')">
+     Վճարել մնացածը
+   </button>
+ ` : '<p>Վճարում չկա։</p>';
 }
 function renderOrders(){
  const box=document.getElementById('ordersList');
@@ -50,10 +78,27 @@ function renderOrders(){
  showOrder(userOrders[0].id);
 }
 function showOrder(id){
- const o=userOrders.find(x=>x.id===id); if(!o) return;
+ const o=userOrders.find(x=>x.id===id);
+ if(!o) return;
+
  document.querySelectorAll('.order-card').forEach(c=>c.classList.remove('selected'));
+
  const detail=o.details||{};
- document.getElementById('orderDetails').innerHTML=`<h2>${o.product}</h2><p>#AA-${o.id} • ${o.status||'Նոր պատվեր'}</p>${timeline(o.status)}<div class="pay-line"><span>Ընդհանուր</span><b>${money(o.price)}</b></div><div class="pay-line"><span>Վճարված</span><b>${money(o.paid_amount)}</b></div><div class="pay-line"><span>Մնացած</span><b>${money(remaining(o))}</b></div><pre style="white-space:pre-wrap;background:#fff;border-radius:16px;padding:16px">${JSON.stringify(detail,null,2)}</pre>`;
+
+ document.getElementById('orderDetails').innerHTML=`
+   <h2>${o.product}</h2>
+   <p>#AA-${o.id} • ${o.status || 'Նոր պատվեր'}</p>
+
+   ${timeline(o.status)}
+
+   <div class="pay-line"><span>Ընդհանուր</span><b>${money(o.price)}</b></div>
+   <div class="pay-line"><span>Կանխավճար</span><b>${money(o.deposit_amount)}</b></div>
+   <div class="pay-line"><span>Վճարված</span><b>${money(o.paid_amount)}</b></div>
+   <div class="pay-line"><span>Մնացած</span><b>${money(remaining(o))}</b></div>
+   <div class="pay-line"><span>Վճարման կարգավիճակ</span><b>${o.payment_status || 'Չհաստատված'}</b></div>
+
+   <pre style="white-space:pre-wrap;background:#fff;border-radius:16px;padding:16px">${JSON.stringify(detail,null,2)}</pre>
+ `;
 }
 function renderPayments(){
  const box=document.getElementById('paymentsList');
