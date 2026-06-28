@@ -80,13 +80,36 @@ function renderOrders(){
  </tr>`).join('') || '<tr><td colspan="7">Պատվերներ չկան</td></tr>';
 }
 async function saveOrder(id){
- const paid=Number(document.getElementById('paid_'+id).value||0);
- const status=document.getElementById('status_'+id).value;
- const order=adminOrders.find(o=>o.id===id);
- const payment_status=paid<=0?'unpaid':(paid>=Number(order.price||0)?'paid':'deposit_paid');
- const {error}=await aramazdClient.from('orders').update({paid_amount:paid,status,payment_status}).eq('id',id);
- if(error){alert('Սխալ։ '+error.message);return;}
- alert('Պահպանվեց ✅'); await loadOrders();
+ const paid = Number(document.getElementById('paid_' + id).value || 0);
+ const status = document.getElementById('status_' + id).value;
+ const order = adminOrders.find(o => o.id === id);
+
+ let payment_status = 'Չհաստատված';
+
+ if (paid > 0 && paid < Number(order.price || 0)) {
+   payment_status = 'Կանխավճար ստացված';
+ }
+
+ if (paid >= Number(order.price || 0)) {
+   payment_status = 'Ամբողջությամբ վճարված';
+ }
+
+ const { error } = await aramazdClient
+   .from('orders')
+   .update({
+     paid_amount: paid,
+     status: status,
+     payment_status: payment_status
+   })
+   .eq('id', id);
+
+ if(error){
+   alert('Սխալ։ ' + error.message);
+   return;
+ }
+
+ alert('Պահպանվեց ✅');
+ await loadOrders();
 }
 async function logoutAdmin(){await aramazdClient.auth.signOut();location.href='login.html';}
 document.addEventListener('DOMContentLoaded',checkAdmin);
