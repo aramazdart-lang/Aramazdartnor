@@ -40,23 +40,14 @@ function stepIndex(status){
 }
 
 function timeline(status){
-  const steps=[
-    'Տվյալները ստացվել են',
-    'Ստեղծման փուլ',
-    'Նկարազարդում/դիզայն',
-    'Տպագրություն',
-    'Պատրաստ է',
-    'Առաքում'
-  ];
-
+  const steps=['Տվյալները ստացվել են','Ստեղծման փուլ','Նկարազարդում/դիզայն','Տպագրություն','Պատրաստ է','Առաքում'];
   const cur=stepIndex(status);
 
   return `<div class="timeline five-step">${
     steps.map((s,i)=>{
       const n=i+1;
       return `<div class="${n<cur?'done':n===cur?'current':''}">
-        <b>${n<cur?'✓':n}</b>
-        <span>${s}</span>
+        <b>${n<cur?'✓':n}</b><span>${s}</span>
       </div>`;
     }).join('')
   }</div>`;
@@ -104,18 +95,13 @@ async function loadOrders(){
   }
 
   userOrders=data||[];
-
   renderDashboard();
   renderOrders();
   renderPayments();
 }
 
 function renderDashboard(){
-  const active=userOrders.filter(o=>
-    !String(o.status||'').includes('Ավարտ') &&
-    !String(o.status||'').includes('Առաքված')
-  );
-
+  const active=userOrders.filter(o=>!String(o.status||'').includes('Ավարտ')&&!String(o.status||'').includes('Առաքված'));
   const done=userOrders.length-active.length;
   const debt=userOrders.reduce((s,o)=>s+remaining(o),0);
 
@@ -126,33 +112,28 @@ function renderDashboard(){
 
   const latest=userOrders[0];
 
-  document.getElementById('activeOrderBox').innerHTML = latest ? `
+  document.getElementById('activeOrderBox').innerHTML=latest?`
     <div class="order-head">
       <div>
         <h3>${latest.product}</h3>
-        <p>Պատվեր #AA-${latest.id} • ${latest.status || 'Նոր պատվեր'}</p>
+        <p>Պատվեր #AA-${latest.id} • ${latest.status||'Նոր պատվեր'}</p>
       </div>
-      <span class="badge yellow">${latest.status || 'Նոր պատվեր'}</span>
+      <span class="badge yellow">${latest.status||'Նոր պատվեր'}</span>
     </div>
 
     ${timeline(latest.status)}
 
-    <div class="pay-line">
-      <span>Վճարման վիճակ</span>
-      <b>${latest.payment_status || 'Չհաստատված'}</b>
-    </div>
-  ` : '<p>Դեռ պատվերներ չկան։</p>';
+    <div class="pay-line"><span>Վճարման վիճակ</span><b>${latest.payment_status||'Չհաստատված'}</b></div>
+    <div class="pay-line"><span>Մնացած գումար</span><b>${money(remaining(latest))}</b></div>
+  `:'<p>Դեռ պատվերներ չկան։</p>';
 
-  document.getElementById('paymentBox').innerHTML = latest ? `
+  document.getElementById('paymentBox').innerHTML=latest?`
     <div class="pay-line"><span>Ընդհանուր</span><b>${money(latest.price)}</b></div>
     <div class="pay-line"><span>Կանխավճար</span><b>${money(latest.deposit_amount)}</b></div>
     <div class="pay-line"><span>Վճարված</span><b>${money(latest.paid_amount)}</b></div>
     <div class="pay-line"><span>Մնացած</span><b>${money(remaining(latest))}</b></div>
-    <div class="pay-line"><span>Վճարման կարգավիճակ</span><b>${latest.payment_status || 'Չհաստատված'}</b></div>
-    <button onclick="demoFinalPayment(${latest.id})">
-      Վճարել մնացածը
-    </button>
-  ` : '<p>Վճարում չկա։</p>';
+    <button onclick="demoFinalPayment(${latest.id})">Վճարել մնացածը</button>
+  `:'<p>Վճարում չկա։</p>';
 }
 
 function renderOrders(){
@@ -181,11 +162,10 @@ function showOrder(id){
   if(!o) return;
 
   const detail=o.details||{};
-  const isDeliveryStage=String(o.status||'').includes('Առաք') || String(o.status||'').includes('Պատրաստ');
 
   document.getElementById('orderDetails').innerHTML=`
     <h2>${o.product}</h2>
-    <p>#AA-${o.id} • ${o.status || 'Նոր պատվեր'}</p>
+    <p>#AA-${o.id} • ${o.status||'Նոր պատվեր'}</p>
 
     ${timeline(o.status)}
 
@@ -193,9 +173,9 @@ function showOrder(id){
     <div class="pay-line"><span>Կանխավճար</span><b>${money(o.deposit_amount)}</b></div>
     <div class="pay-line"><span>Վճարված</span><b>${money(o.paid_amount)}</b></div>
     <div class="pay-line"><span>Մնացած</span><b>${money(remaining(o))}</b></div>
-    <div class="pay-line"><span>Վճարման կարգավիճակ</span><b>${o.payment_status || 'Չհաստատված'}</b></div>
+    <div class="pay-line"><span>Վճարման կարգավիճակ</span><b>${o.payment_status||'Չհաստատված'}</b></div>
 
-    ${isDeliveryStage ? deliveryForm(o) : ''}
+    ${deliveryForm(o)}
 
     <pre style="white-space:pre-wrap;background:#fff;border-radius:16px;padding:16px">${JSON.stringify(detail,null,2)}</pre>
   `;
@@ -209,27 +189,27 @@ function deliveryForm(o){
 
       <div class="profile-form">
         <label>Ստացողի անուն
-          <input id="deliveryName_${o.id}" value="${o.recipient_name || currentProfile?.full_name || ''}">
+          <input id="deliveryName_${o.id}" value="${o.recipient_name||currentProfile?.full_name||''}">
         </label>
 
         <label>Հեռախոս
-          <input id="deliveryPhone_${o.id}" value="${o.delivery_phone || currentProfile?.phone || o.phone || ''}">
+          <input id="deliveryPhone_${o.id}" value="${o.delivery_phone||currentProfile?.phone||o.phone||''}">
         </label>
 
         <label>Քաղաք / գյուղ
-          <input id="deliveryCity_${o.id}" value="${o.delivery_city || currentProfile?.city || ''}">
+          <input id="deliveryCity_${o.id}" value="${o.delivery_city||currentProfile?.city||''}">
         </label>
 
         <label>Հասցե
-          <input id="deliveryAddress_${o.id}" value="${o.delivery_address || currentProfile?.address || ''}">
+          <input id="deliveryAddress_${o.id}" value="${o.delivery_address||currentProfile?.address||''}">
         </label>
 
         <label>Փոստային ինդեքս
-          <input id="postalCode_${o.id}" value="${o.postal_code || currentProfile?.postal_code || ''}">
+          <input id="postalCode_${o.id}" value="${o.postal_code||currentProfile?.postal_code||''}">
         </label>
 
         <label>Նշում
-          <textarea id="deliveryNote_${o.id}" placeholder="օր․ զանգել մինչ առաքումը">${o.delivery_note || ''}</textarea>
+          <textarea id="deliveryNote_${o.id}" placeholder="օր․ զանգել մինչ առաքումը">${o.delivery_note||''}</textarea>
         </label>
 
         <button onclick="saveDelivery(${o.id})">Պահպանել առաքման տվյալները</button>
@@ -239,9 +219,7 @@ function deliveryForm(o){
 
       <h2>Վերջնական վճարում</h2>
       <p>Մնացած գումար՝ <b>${money(remaining(o))}</b></p>
-      <button onclick="demoFinalPayment(${o.id})">
-        Վճարել մնացածը
-      </button>
+      <button onclick="demoFinalPayment(${o.id})">Վճարել մնացածը</button>
     </div>
   `;
 }
