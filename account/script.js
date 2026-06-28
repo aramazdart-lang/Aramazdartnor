@@ -177,8 +177,7 @@ function showOrder(id){
 
     ${deliveryForm(o)}
 
-    <pre style="white-space:pre-wrap;background:#fff;border-radius:16px;padding:16px">${JSON.stringify(detail,null,2)}</pre>
-  `;
+    
 }
 
 function deliveryForm(o){
@@ -217,9 +216,13 @@ function deliveryForm(o){
 
       <hr style="margin:25px 0">
 
-      <h2>Վերջնական վճարում</h2>
-      <p>Մնացած գումար՝ <b>${money(remaining(o))}</b></p>
-      <button onclick="demoFinalPayment(${o.id})">Վճարել մնացածը</button>
+     <h2>Վերջնական վճարում</h2>
+<p>Մնացած գումար՝ <b>${money(remaining(o))}</b></p>
+<p>Վճարման վիճակ՝ <b>${o.final_payment_status || 'Չվճարված'}</b></p>
+
+<button onclick="demoFinalPayment(${o.id})">
+  Վճարել մնացածը
+</button>
     </div>
   `;
 }
