@@ -21,13 +21,9 @@ buttons.forEach(btn=>btn.addEventListener('click',()=>{
   title.textContent=titles[page];
 }));
 
-function money(n){
-  return Number(n||0).toLocaleString('hy-AM')+' դր․';
-}
-
-function remaining(o){
-  return Math.max(Number(o.price||0)-Number(o.paid_amount||0),0);
-}
+function money(n){ return Number(n||0).toLocaleString('hy-AM')+' դր․'; }
+function remaining(o){ return Math.max(Number(o.price||0)-Number(o.paid_amount||0),0); }
+function isDeliveryStage(o){ return ['Առաքում','Առաքված'].includes(String(o.status||'')); }
 
 function stepIndex(status){
   if(!status) return 1;
@@ -42,24 +38,15 @@ function stepIndex(status){
 function timeline(status){
   const steps=['Տվյալները ստացվել են','Ստեղծման փուլ','Նկարազարդում/դիզայն','Տպագրություն','Պատրաստ է','Առաքում'];
   const cur=stepIndex(status);
-
-  return `<div class="timeline five-step">${
-    steps.map((s,i)=>{
-      const n=i+1;
-      return `<div class="${n<cur?'done':n===cur?'current':''}">
-        <b>${n<cur?'✓':n}</b><span>${s}</span>
-      </div>`;
-    }).join('')
-  }</div>`;
+  return `<div class="timeline five-step">${steps.map((s,i)=>{
+    const n=i+1;
+    return `<div class="${n<cur?'done':n===cur?'current':''}"><b>${n<cur?'✓':n}</b><span>${s}</span></div>`;
+  }).join('')}</div>`;
 }
 
 async function init(){
   const session=await Aramazd.getSession();
-
-  if(!session){
-    location.href='../login.html?next=account/index.html';
-    return;
-  }
+  if(!session){ location.href='../login.html?next=account/index.html'; return; }
 
   currentUser=session.user;
   currentProfile=await Aramazd.ensureProfile(currentUser);
@@ -68,9 +55,7 @@ async function init(){
   document.getElementById('userEmail').textContent=currentUser.email;
   document.getElementById('avatar').textContent=(currentProfile?.full_name||currentUser.email||'Ա').trim()[0].toUpperCase();
 
-  if(currentProfile?.role==='admin'){
-    document.getElementById('adminLink').style.display='block';
-  }
+  if(currentProfile?.role==='admin') document.getElementById('adminLink').style.display='block';
 
   document.getElementById('profileName').value=currentProfile?.full_name||'';
   document.getElementById('profileEmail').value=currentUser.email||'';
@@ -104,13 +89,12 @@ function renderDashboard(){
   const active=userOrders.filter(o=>!String(o.status||'').includes('Ավարտ')&&!String(o.status||'').includes('Առաքված'));
   const done=userOrders.length-active.length;
   const debt=userOrders.reduce((s,o)=>s+remaining(o),0);
+  const latest=userOrders[0];
 
   document.getElementById('statAll').textContent=userOrders.length;
   document.getElementById('statActive').textContent=active.length;
   document.getElementById('statDone').textContent=done;
   document.getElementById('statDebt').textContent=money(debt);
-
-  const latest=userOrders[0];
 
   document.getElementById('activeOrderBox').innerHTML=latest?`
     <div class="order-head">
@@ -120,11 +104,10 @@ function renderDashboard(){
       </div>
       <span class="badge yellow">${latest.status||'Նոր պատվեր'}</span>
     </div>
-
     ${timeline(latest.status)}
-
     <div class="pay-line"><span>Վճարման վիճակ</span><b>${latest.payment_status||'Չհաստատված'}</b></div>
     <div class="pay-line"><span>Մնացած գումար</span><b>${money(remaining(latest))}</b></div>
+    ${isDeliveryStage(latest)?deliveryForm(latest):''}
   `:'<p>Դեռ պատվերներ չկան։</p>';
 
   document.getElementById('paymentBox').innerHTML=latest?`
@@ -138,11 +121,7 @@ function renderDashboard(){
 
 function renderOrders(){
   const box=document.getElementById('ordersList');
-
-  if(!userOrders.length){
-    box.innerHTML='<p>Դեռ պատվերներ չկան։</p>';
-    return;
-  }
+  if(!userOrders.length){ box.innerHTML='<p>Դեռ պատվերներ չկան։</p>'; return; }
 
   box.innerHTML=userOrders.map(o=>`
     <article class="order-card" onclick="showOrder(${o.id})">
@@ -161,23 +140,17 @@ function showOrder(id){
   const o=userOrders.find(x=>x.id===id);
   if(!o) return;
 
-  const detail=o.details||{};
-
   document.getElementById('orderDetails').innerHTML=`
     <h2>${o.product}</h2>
     <p>#AA-${o.id} • ${o.status||'Նոր պատվեր'}</p>
-
     ${timeline(o.status)}
-
     <div class="pay-line"><span>Ընդհանուր</span><b>${money(o.price)}</b></div>
     <div class="pay-line"><span>Կանխավճար</span><b>${money(o.deposit_amount)}</b></div>
     <div class="pay-line"><span>Վճարված</span><b>${money(o.paid_amount)}</b></div>
     <div class="pay-line"><span>Մնացած</span><b>${money(remaining(o))}</b></div>
     <div class="pay-line"><span>Վճարման կարգավիճակ</span><b>${o.payment_status||'Չհաստատված'}</b></div>
-
-    ${deliveryForm(o)}
-
-    
+    ${isDeliveryStage(o)?deliveryForm(o):''}
+  `;
 }
 
 function deliveryForm(o){
@@ -185,44 +158,20 @@ function deliveryForm(o){
     <div class="panel" style="margin-top:20px">
       <h2>Առաքման տվյալներ</h2>
       <p>Լրացրեք տվյալները ՀայՓոստով կամ առաքմամբ ուղարկելու համար։</p>
-
       <div class="profile-form">
-        <label>Ստացողի անուն
-          <input id="deliveryName_${o.id}" value="${o.recipient_name||currentProfile?.full_name||''}">
-        </label>
-
-        <label>Հեռախոս
-          <input id="deliveryPhone_${o.id}" value="${o.delivery_phone||currentProfile?.phone||o.phone||''}">
-        </label>
-
-        <label>Քաղաք / գյուղ
-          <input id="deliveryCity_${o.id}" value="${o.delivery_city||currentProfile?.city||''}">
-        </label>
-
-        <label>Հասցե
-          <input id="deliveryAddress_${o.id}" value="${o.delivery_address||currentProfile?.address||''}">
-        </label>
-
-        <label>Փոստային ինդեքս
-          <input id="postalCode_${o.id}" value="${o.postal_code||currentProfile?.postal_code||''}">
-        </label>
-
-        <label>Նշում
-          <textarea id="deliveryNote_${o.id}" placeholder="օր․ զանգել մինչ առաքումը">${o.delivery_note||''}</textarea>
-        </label>
-
+        <label>Ստացողի անուն<input id="deliveryName_${o.id}" value="${o.recipient_name||currentProfile?.full_name||''}"></label>
+        <label>Հեռախոս<input id="deliveryPhone_${o.id}" value="${o.delivery_phone||currentProfile?.phone||o.phone||''}"></label>
+        <label>Քաղաք / գյուղ<input id="deliveryCity_${o.id}" value="${o.delivery_city||currentProfile?.city||''}"></label>
+        <label>Հասցե<input id="deliveryAddress_${o.id}" value="${o.delivery_address||currentProfile?.address||''}"></label>
+        <label>Փոստային ինդեքս<input id="postalCode_${o.id}" value="${o.postal_code||currentProfile?.postal_code||''}"></label>
+        <label>Նշում<textarea id="deliveryNote_${o.id}" placeholder="օր․ զանգել մինչ առաքումը">${o.delivery_note||''}</textarea></label>
         <button onclick="saveDelivery(${o.id})">Պահպանել առաքման տվյալները</button>
       </div>
-
       <hr style="margin:25px 0">
-
-     <h2>Վերջնական վճարում</h2>
-<p>Մնացած գումար՝ <b>${money(remaining(o))}</b></p>
-<p>Վճարման վիճակ՝ <b>${o.final_payment_status || 'Չվճարված'}</b></p>
-
-<button onclick="demoFinalPayment(${o.id})">
-  Վճարել մնացածը
-</button>
+      <h2>Վերջնական վճարում</h2>
+      <p>Մնացած գումար՝ <b>${money(remaining(o))}</b></p>
+      <p>Վճարման վիճակ՝ <b>${o.final_payment_status||'Չվճարված'}</b></p>
+      <button onclick="demoFinalPayment(${o.id})">Վճարել մնացածը</button>
     </div>
   `;
 }
@@ -237,16 +186,8 @@ async function saveDelivery(id){
     delivery_note:document.getElementById('deliveryNote_'+id).value
   };
 
-  const {error}=await aramazdClient
-    .from('orders')
-    .update(updates)
-    .eq('id',id)
-    .eq('user_id',currentUser.id);
-
-  if(error){
-    alert('Սխալ։ '+error.message);
-    return;
-  }
+  const {error}=await aramazdClient.from('orders').update(updates).eq('id',id).eq('user_id',currentUser.id);
+  if(error){ alert('Սխալ։ '+error.message); return; }
 
   alert('Առաքման տվյալները պահպանվեցին ✅');
   await loadOrders();
@@ -268,10 +209,7 @@ async function demoFinalPayment(id){
     .eq('id',id)
     .eq('user_id',currentUser.id);
 
-  if(error){
-    alert('Սխալ։ '+error.message);
-    return;
-  }
+  if(error){ alert('Սխալ։ '+error.message); return; }
 
   alert('Demo վերջնական վճարումը գրանցվեց ✅');
   await loadOrders();
@@ -279,24 +217,15 @@ async function demoFinalPayment(id){
 
 function renderPayments(){
   const box=document.getElementById('paymentsList');
-
   box.innerHTML=`
     <div class="panel">
       <h3>Մնացած գումար</h3>
       <div class="big-price">${money(userOrders.reduce((s,o)=>s+remaining(o),0))}</div>
       <p>Իրական վճարման կոճակը կկցվի IDBank/Idram-ից տվյալներ ստանալուց հետո։</p>
     </div>
-
     <div class="panel">
       <h3>Վճարման պատմություն</h3>
-      ${
-        userOrders.map(o=>`
-          <div class="history">
-            <span>#AA-${o.id} ${o.product}</span>
-            <b>${money(o.paid_amount)}</b>
-          </div>
-        `).join('') || '<p>Չկա</p>'
-      }
+      ${userOrders.map(o=>`<div class="history"><span>#AA-${o.id} ${o.product}</span><b>${money(o.paid_amount)}</b></div>`).join('')||'<p>Չկա</p>'}
     </div>
   `;
 }
@@ -310,15 +239,8 @@ async function saveProfile(){
     postal_code:document.getElementById('profileIndex').value
   };
 
-  const {error}=await aramazdClient
-    .from('profiles')
-    .update(updates)
-    .eq('id',currentUser.id);
-
-  if(error){
-    alert('Սխալ։ '+error.message);
-    return;
-  }
+  const {error}=await aramazdClient.from('profiles').update(updates).eq('id',currentUser.id);
+  if(error){ alert('Սխալ։ '+error.message); return; }
 
   alert('Պահպանվեց ✅');
 }
