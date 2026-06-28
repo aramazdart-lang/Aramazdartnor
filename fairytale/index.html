@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Հեքիաթային գիրք | Aramazd Art</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="header">
+  <img src="assets/logo.png" class="logo">
+  <nav><a href="../index.html">Գլխավոր</a><a href="../products.html">Ապրանքներ</a><a>Պատրաստի հեքիաթներ</a><a href="../contact.html">Կապ</a></nav>
+  <a class="header-btn" href="#order">Պատվիրել</a>
+</header>
+
+<main>
+<section class="hero">
+  <div>
+    <span class="label">ARAMAZD ART</span>
+    <h1>Հեքիաթային գիրք</h1>
+    <p>Երեխան դառնում է իր սեփական հեքիաթի գլխավոր հերոսը։ Ընտրեք պատրաստի հեքիաթ կամ պատվիրեք ամբողջությամբ անհատական տարբերակ՝ երեխայի լուսանկարներով։</p>
+    <div class="hero-actions"><a href="#templates" class="btn">Ընտրել հեքիաթը</a><a href="#order" class="btn ghost">Սկսել պատվերը</a></div>
+  </div>
+  <div class="book-cover"><span>📖</span><h3>Քո երեխայի<br>հեքիաթը</h3></div>
+</section>
+
+<section class="info-strip">
+  <div><b>18×25 սմ</b><span>գրքի չափս</span></div>
+  <div><b>10 էջ</b><span>5 թերթ</span></div>
+  <div><b>Կոշտ կազմ</b><span>պրեմիում տեսք</span></div>
+  <div><b>7–12 օր</b><span>պատրաստում</span></div>
+</section>
+
+<section id="prices" class="section">
+  <div class="section-head"><span>Ընտրեք տարբերակը</span><h2>Գրքի տեսակները</h2></div>
+  <div class="pricing-grid">
+    <div class="price-card plan-card" data-mode="ready"><h3>Պատրաստի գիրք</h3><p>Պատրաստի հեքիաթ և նկարազարդումներ՝ երեխայի լուսանկարներով։</p><strong>9,500 դր․</strong><button type="button" onclick="selectPlan('Պատրաստի գիրք',9500,'ready',this)">Ընտրել</button></div>
+    <div class="price-card plan-card" data-mode="ready"><h3>Պատրաստի գիրք + NFC</h3><p>Պատրաստի գիրք՝ մուլտֆիլմային թվային տարբերակով։</p><strong>11,000 դր․</strong><button type="button" onclick="selectPlan('Պատրաստի գիրք + NFC',11000,'ready',this)">Ընտրել</button></div>
+    <div class="price-card plan-card" data-mode="custom"><h3>Անհատական գիրք</h3><p>Հեքիաթը ստեղծվում է երեխայի հետաքրքրությունների հիման վրա։</p><strong>14,500 դր․</strong><button type="button" onclick="selectPlan('Անհատական գիրք',14500,'custom',this)">Ընտրել</button></div>
+    <div class="price-card featured plan-card selected-plan" data-mode="custom"><div class="badge">Առաջարկվող</div><h3>Անհատական գիրք + NFC</h3><p>Անհատական հեքիաթ և մուլտֆիլմային տարբերակ NFC-ով։</p><strong>17,000 դր․</strong><button type="button" onclick="selectPlan('Անհատական գիրք + NFC',17000,'custom',this)">Ընտրել</button></div>
+  </div>
+</section>
+
+<section id="templates" class="section templates-section order-mode ready-mode hidden">
+  <div class="section-head">
+    <span>Պատրաստի հեքիաթներ</span>
+    <h2>Ընտրեք հեքիաթի տարբերակը</h2>
+    <p>Կարդացեք հեքիաթի կարճ հատվածը, նայեք անորակ/վոթերմարկով preview պատկերները և ընտրեք այն տարբերակը, որը ցանկանում եք պատվիրել։</p>
+  </div>
+
+  <div class="template-grid">
+    <article class="template-card" onclick="selectTemplate('Արևիկի ոսկե ճանապարհը', this)">
+      <div class="preview"><span class="wm">ARAMAZD PREVIEW</span><b>🌞</b></div>
+      <h3>Արևիկի ոսկե ճանապարհը</h3>
+      <p>Մի փոքրիկ հերոս հայտնվում է լուսավոր ճանապարհի վրա, որտեղ ամեն քայլ սովորեցնում է հավատալ սեփական ուժերին...</p>
+      <button>Ընտրել այս հեքիաթը</button>
+    </article>
+    <article class="template-card" onclick="selectTemplate('Փոքրիկ պահապանը', this)">
+      <div class="preview"><span class="wm">ARAMAZD PREVIEW</span><b>🛡️</b></div>
+      <h3>Փոքրիկ պահապանը</h3>
+      <p>Հեքիաթ ընկերության, խիզախության և մի կախարդական բանալու մասին, որը բացում է բարության դարպասը...</p>
+      <button>Ընտրել այս հեքիաթը</button>
+    </article>
+    <article class="template-card" onclick="selectTemplate('Կախարդական անտառի գաղտնիքը', this)">
+      <div class="preview"><span class="wm">ARAMAZD PREVIEW</span><b>🌳</b></div>
+      <h3>Կախարդական անտառի գաղտնիքը</h3>
+      <p>Երեխան մտնում է անտառ, որտեղ կենդանիները խոսում են, իսկ ամեն բարի քայլ վերածվում է լույսի...</p>
+      <button>Ընտրել այս հեքիաթը</button>
+    </article>
+    <article class="template-card" onclick="selectTemplate('Աստղերի փոքրիկ ընկերն', this)">
+      <div class="preview"><span class="wm">ARAMAZD PREVIEW</span><b>⭐</b></div>
+      <h3>Աստղերի փոքրիկ ընկերը</h3>
+      <p>Գիշերային երկնքում մի աստղ օգնություն է խնդրում, և փոքրիկ հերոսը սկսում է իր ամենաջերմ արկածը...</p>
+      <button>Ընտրել այս հեքիաթը</button>
+    </article>
+    <article class="template-card" onclick="selectTemplate('Ծիածանի նվերը', this)">
+      <div class="preview"><span class="wm">ARAMAZD PREVIEW</span><b>🌈</b></div>
+      <h3>Ծիածանի նվերը</h3>
+      <p>Գույներով լի պատմություն, որտեղ երեխան սովորում է, որ ամեն գույն ունի իր գեղեցիկ ուժը...</p>
+      <button>Ընտրել այս հեքիաթը</button>
+    </article>
+    <article class="template-card" onclick="selectTemplate('Փոքրիկ ճանապարհորդը', this)">
+      <div class="preview"><span class="wm">ARAMAZD PREVIEW</span><b>🧭</b></div>
+      <h3>Փոքրիկ ճանապարհորդը</h3>
+      <p>Ջերմ, արկածային պատմություն ճանապարհի, ընկերների և տուն վերադառնալու ուրախության մասին...</p>
+      <button>Ընտրել այս հեքիաթը</button>
+    </article>
+    <article class="template-card" onclick="selectTemplate('Բարի սրտի կախարդանքը', this)">
+      <div class="preview"><span class="wm">ARAMAZD PREVIEW</span><b>💛</b></div>
+      <h3>Բարի սրտի կախարդանքը</h3>
+      <p>Պատմություն բարության մասին, որտեղ փոքրիկ օգնությունը կարող է փոխել ամբողջ հեքիաթային աշխարհը...</p>
+      <button>Ընտրել այս հեքիաթը</button>
+    </article>
+  </div>
+</section>
+
+<section class="section photo-section">
+  <div class="section-head"><span>Լուսանկարների պահանջներ</span><h2>Ինչպիսի նկարներ ուղարկել</h2><p>Քանի որ ընտրված հեքիաթի նկարազարդումներում դիրքերը արդեն պատրաստ են, մենք ցույց կտանք՝ ինչ դիրքով լուսանկարներ են պետք։</p></div>
+  <div class="photo-grid">
+    <div class="photo-card"><img src="assets/boy.jpg"><div><h3>Լավ օրինակ</h3><ul><li>դեմքը պարզ երևում է</li><li>լավ լուսավորություն</li><li>մարմինը տեսանելի է</li></ul></div></div>
+    <div class="photo-card"><img src="assets/girl.png"><div><h3>Լավ օրինակ</h3><ul><li>երեխան կենտրոնում է</li><li>նկարը բարձր որակով է</li><li>դեմքը փակված չէ</li></ul></div></div>
+  </div>
+</section>
+
+<section id="order" class="order-section">
+  <div class="form-wrap">
+    <div class="section-head left"><span>Պատվերի հարցաշար</span><h2>Լրացրեք պատվերի տվյալները</h2></div>
+    <form class="order-form">
+      <div class="selected-template">Ընտրված հեքիաթ՝ <b id="selectedTemplate">Դեռ ընտրված չէ</b></div>
+
+      <div id="readyBlock" class="ready-block hidden">
+        <h3>Պատրաստի հեքիաթի համար անհրաժեշտ լուսանկարների դիրքերը</h3>
+        <p>Ընտրած հեքիաթի նկարազարդումները արդեն պատրաստ են։ Այդ պատճառով այստեղ նշված դիրքերով նկարները կօգնեն մեզ երեխային ճիշտ տեղադրել էջերում։</p>
+        <div class="pose-grid">
+          <div>1. Դիմային լուսանկար</div>
+          <div>2. Ամբողջ հասակով</div>
+          <div>3. Կանգնած աջ կողմով</div>
+          <div>4. Կանգնած ձախ կողմով</div>
+          <div>5. Նստած դիրք</div>
+          <div>6. Ժպտացող դեմք</div>
+        </div>
+      </div>
+
+      <div id="customBlock" class="custom-block hidden">
+        <h3>Անհատական հեքիաթի հարցաշար</h3>
+        <p>Այս բաժինը լրացվում է միայն անհատական հեքիաթի դեպքում, որպեսզի պատմությունը ստեղծվի երեխայի հետաքրքրությունների հիման վրա։</p>
+      </div>
+
+      <div class="grid-2">
+        <label>Երեխայի անունը<input type="text" placeholder="օր․ Էվա"></label>
+        <label>Հեռախոսահամար<input type="tel" placeholder="+374"></label>
+        <label>Տարիքը<input type="number" placeholder="օր․ 5"></label>
+        <label>Սեռը<select><option>Աղջիկ</option><option>Տղա</option></select></label>
+      </div>
+
+      <div id="customQuestions" class="custom-questions hidden">
+      <label>Սիրելի գույնը / գույները<input type="text" placeholder="օր․ վարդագույն, կապույտ"></label>
+      <label>Սիրելի կենդանի կամ խաղալիք<input type="text" placeholder="օր․ շնիկ, արջուկ, մեքենա"></label>
+      <label>Ինչով է երեխան հետաքրքրվում<input type="text" placeholder="օր․ դինոզավրեր, երաժշտություն, տիեզերք"></label>
+
+      </div>
+
+      <div id="customOnlyFields" class="custom-only-fields">
+<label class="upload-box">
+        <span>Կցել երեխայի նկարները</span>
+        <small>Նվազագույնը 10 նկար։ Ցանկալի է՝ տարբեր դիրքերով և լավ որակով։</small>
+        <input id="photoUpload" type="file" accept="image/*" multiple onchange="handleFiles(event)">
+      </label>
+      <div id="uploadStatus" class="upload-status">Կցված է 0 նկար / նվազագույնը 10</div>
+      <div id="thumbs" class="thumbs"></div>
+
+      <div class="choice-block">
+        <p>Պատմության ոճը</p>
+        <label><input type="checkbox"> Արկածային</label>
+        <label><input type="checkbox"> Ջերմ և ընտանեկան</label>
+        <label><input type="checkbox"> Ուսուցողական</label>
+        <label><input type="checkbox"> Ընկերության մասին</label>
+        <label><input type="checkbox"> Խիզախության մասին</label>
+      </div>
+
+      <label>Կարևոր մանրամասներ<textarea placeholder="Գրեք՝ ինչ պետք է պարտադիր երևա հեքիաթում..."></textarea></label>
+
+      <div class="extras">
+        <div><p>Հավելյալ հերոսներ</p><div class="counter"><button type="button" onclick="changeHero(-1)">−</button><span id="heroCount">0</span><button type="button" onclick="changeHero(1)">+</button></div><small>յուրաքանչյուր հավելյալ հերոս՝ +2,000 դր․</small></div>
+        <div><p>Հավելյալ թերթեր</p><div class="counter"><button type="button" onclick="changePage(-1)">−</button><span id="pageCount">0</span><button type="button" onclick="changePage(1)">+</button></div><small>յուրաքանչյուր հավելյալ թերթ՝ +2,500 դր․</small></div>
+      </div>
+
+      
+      
+</div>
+
+      
+      <div id="readyOnlyInfo" class="ready-only-info hidden">
+        <h3>Պատրաստի գրքի պատվեր</h3>
+        <p>Այս տարբերակի դեպքում լրացուցիչ հարցաշար և հետաքրքրությունների դաշտեր պետք չեն։ Դուք ընտրում եք պատրաստի հեքիաթը, իսկ մնացած մանրամասները կհաստատենք կապի միջոցով։</p>
+      </div>
+
+<div class="contact-method">
+        <h3>Ինչպե՞ս կապ հաստատենք ձեզ հետ անհրաժեշտության դեպքում</h3>
+        <label><input type="checkbox" name="contact" checked> WhatsApp</label>
+        <label><input type="checkbox" name="contact"> Telegram</label>
+        <label><input type="checkbox" name="contact"> Հեռախոսազանգ</label>
+      </div>
+
+      <button type="button" class="submit-btn" onclick="fakeSubmit()">Ուղարկել պատվերը</button>
+    </form>
+  </div>
+
+  <aside class="summary">
+    <h3>Պատվերի ամփոփում</h3>
+    <div class="line"><span id="planName">Անհատական գիրք + NFC</span><b id="planPrice">17,000 դր․</b></div>
+    <div class="line"><span>Հավելյալ հերոսներ</span><b id="heroPrice">0 դր․</b></div>
+    <div class="line"><span>Հավելյալ թերթեր</span><b id="pagePrice">0 դր․</b></div>
+    <hr><div class="total"><span>Ընդհանուր</span><b id="totalPrice">17,000 դր․</b></div>
+    <div class="conditions"><p>Գնի մեջ ներառված է՝</p><ul><li>կոշտ կազմ</li><li>10 էջ / 5 թերթ</li><li>մինչև 2 հերոս</li><li>անվճար փաթեթավորում</li><li>անվճար առաքում ՀՀ տարածքում</li></ul></div>
+  </aside>
+</section>
+</main>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="../js/checkout.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
