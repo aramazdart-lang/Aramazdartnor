@@ -177,40 +177,55 @@ function deliveryForm(o){
   `;
 }
 
+function youtubeEmbed(url){
+  if(!url) return '';
+  let id='';
+  if(url.includes('youtu.be/')) id=url.split('youtu.be/')[1].split('?')[0];
+  if(url.includes('watch?v=')) id=url.split('watch?v=')[1].split('&')[0];
+  if(!id) return '';
+  return `https://www.youtube.com/embed/${id}`;
+}
+
 function renderLibrary(){
   const box=document.getElementById('libraryGrid');
-
   if(!box) return;
 
-  const ready=userOrders.filter(o =>
-    o.pdf_url || o.video_url || o.nfc_url || o.preview_url
-  );
+  const ready=userOrders.filter(o=>o.pdf_url || o.preview_url || o.video_url || o.nfc_url || o.tracking_code);
 
   if(!ready.length){
     box.innerHTML=`
       <div class="file-card">
         <div class="file-icon">📁</div>
-        <h3>Դեռ պատրաստ ֆայլեր չկան</h3>
+        <h3>Դեռ ֆայլեր չկան</h3>
         <p>Երբ պատվերը ավարտվի և ֆայլերը կցվեն, դրանք կհայտնվեն այստեղ։</p>
-      </div>
-    `;
+      </div>`;
     return;
   }
 
-  box.innerHTML=ready.map(o=>`
-    <div class="file-card">
-      <div class="file-icon">📚</div>
-      <h3>${o.product}</h3>
-      <p>Պատվեր #AA-${o.id}</p>
+  box.innerHTML=ready.map(o=>{
+    const embed=youtubeEmbed(o.video_url);
+    return `
+      <div class="file-card">
+        ${o.preview_url ? `<img src="${o.preview_url}" alt="Preview" style="width:100%;border-radius:18px;margin-bottom:15px;">` : `<div class="file-icon">📚</div>`}
 
-      ${o.preview_url?`<a class="btn small" target="_blank" href="${o.preview_url}">🖼 Preview</a>`:''}
-      ${o.pdf_url?`<a class="btn small" target="_blank" href="${o.pdf_url}">📖 Ներբեռնել PDF</a>`:''}
-      ${o.video_url?`<a class="btn small" target="_blank" href="${o.video_url}">🎬 Դիտել մուլտֆիլմը</a>`:''}
-      ${o.nfc_url?`<a class="btn small" target="_blank" href="${o.nfc_url}">📱 NFC հղում</a>`:''}
+        <h3>${o.product}</h3>
+        <p>Պատվեր #AA-${o.id}</p>
 
-      ${o.tracking_code?`<p><b>Tracking:</b> ${o.tracking_code}</p>`:''}
-    </div>
-  `).join('');
+        ${o.pdf_url ? `<a class="btn small" target="_blank" href="${o.pdf_url}">📖 Բացել գիրքը</a>` : ''}
+
+        ${embed ? `
+          <div style="margin-top:15px">
+            <iframe width="100%" height="220" src="${embed}" frameborder="0" allowfullscreen style="border-radius:16px"></iframe>
+          </div>
+        ` : ''}
+
+        ${o.video_url && !embed ? `<a class="btn small" target="_blank" href="${o.video_url}">🎬 Դիտել մուլտֆիլմը</a>` : ''}
+
+        ${o.nfc_url ? `<a class="btn small" target="_blank" href="${o.nfc_url}">📱 NFC հղում</a>` : ''}
+
+        ${o.tracking_code ? `<p><b>📦 Tracking:</b> ${o.delivery_company||''} ${o.tracking_code}</p>` : ''}
+      </div>`;
+  }).join('');
 }
 
 async function saveDelivery(id){
