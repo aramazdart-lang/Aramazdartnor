@@ -6,6 +6,7 @@
 <title>Պատվերի կառավարում | Aramazd Art</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
 <div class="admin-wrap">
@@ -38,8 +39,15 @@ function id(){
   return new URLSearchParams(location.search).get('id');
 }
 
+function safeName(name){
+  return String(name || 'file')
+    .replace(/[^\w.\-]+/g,'_')
+    .toLowerCase();
+}
+
 async function checkAdmin(){
   const session=await Aramazd.getSession();
+
   if(!session){
     location.href='login.html?next=admin-order.html?id='+id();
     return;
@@ -135,20 +143,42 @@ function renderOrder(){
     <div class="pay-box">
       <h2>Ֆայլեր հաճախորդի համար</h2>
 
-      <label>PDF հղում
-        <input id="pdf_url" value="${order.pdf_url||''}" placeholder="https://...">
+      <label>Upload PDF
+        <input id="pdfFile" type="file" accept="application/pdf">
       </label>
 
-      <label>Մուլտֆիլմ / Video հղում
-        <input id="video_url" value="${order.video_url||''}" placeholder="https://...">
+      <button class="mini-btn" onclick="uploadFile('pdfs','pdfFile','pdf_url')">
+        Upload PDF
+      </button>
+
+      <p>
+        <b>PDF:</b>
+        ${order.pdf_url ? `<a href="${order.pdf_url}" target="_blank">բացել</a>` : 'չկա'}
+      </p>
+
+      <hr>
+
+      <label>Upload Preview image
+        <input id="previewFile" type="file" accept="image/*">
+      </label>
+
+      <button class="mini-btn" onclick="uploadFile('previews','previewFile','preview_url')">
+        Upload Preview
+      </button>
+
+      <p>
+        <b>Preview:</b>
+        ${order.preview_url ? `<a href="${order.preview_url}" target="_blank">բացել</a>` : 'չկա'}
+      </p>
+
+      <hr>
+
+      <label>YouTube Unlisted մուլտֆիլմի հղում
+        <input id="video_url" value="${order.video_url||''}" placeholder="https://youtu.be/...">
       </label>
 
       <label>NFC հղում
-        <input id="nfc_url" value="${order.nfc_url||''}" placeholder="https://...">
-      </label>
-
-      <label>Preview նկարի հղում
-        <input id="preview_url" value="${order.preview_url||''}" placeholder="https://...">
+        <input id="nfc_url" value="${order.nfc_url||order.video_url||''}" placeholder="https://youtu.be/...">
       </label>
     </div>
 
@@ -172,8 +202,54 @@ function renderOrder(){
   `;
 }
 
+async function uploadFile(bucket,inputId,column){
+  const input=document.getElementById(inputId);
+  const file=input.files[0];
+
+  if(!file){
+    alert('Ընտրեք ֆայլը');
+    return;
+  }
+
+  const path=`order-${order.id}/${Date.now()}-${safeName(file.name)}`;
+
+  const {error:uploadError}=await aramazdClient
+    .storage
+    .from(bucket)
+    .upload(path,file,{
+      cacheControl:'3600',
+      upsert:true
+    });
+
+  if(uploadError){
+    alert('Upload սխալ․ '+uploadError.message);
+    return;
+  }
+
+  const {data}=aramazdClient
+    .storage
+    .from(bucket)
+    .getPublicUrl(path);
+
+  const publicUrl=data.publicUrl;
+
+  const {error:updateError}=await aramazdClient
+    .from('orders')
+    .update({[column]:publicUrl})
+    .eq('id',order.id);
+
+  if(updateError){
+    alert('DB սխալ․ '+updateError.message);
+    return;
+  }
+
+  alert('Ֆայլը կցվեց ✅');
+  await loadOrder();
+}
+
 async function saveOrder(){
   const paid=Number(document.getElementById('paid').value||0);
+
   let payment_status='Չհաստատված';
 
   if(paid>0 && paid<Number(order.price||0)){
@@ -184,14 +260,15 @@ async function saveOrder(){
     payment_status='Ամբողջությամբ վճարված';
   }
 
+  const videoUrl=document.getElementById('video_url').value;
+  const nfcUrl=document.getElementById('nfc_url').value || videoUrl;
+
   const updates={
     status:document.getElementById('status').value,
     paid_amount:paid,
     payment_status,
-    pdf_url:document.getElementById('pdf_url').value,
-    video_url:document.getElementById('video_url').value,
-    nfc_url:document.getElementById('nfc_url').value,
-    preview_url:document.getElementById('preview_url').value,
+    video_url:videoUrl,
+    nfc_url:nfcUrl,
     delivery_company:document.getElementById('delivery_company').value,
     tracking_code:document.getElementById('tracking_code').value,
     admin_note:document.getElementById('admin_note').value
