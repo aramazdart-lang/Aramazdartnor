@@ -151,10 +151,7 @@ function renderOrder(){
         Upload PDF
       </button>
 
-      <p>
-        <b>PDF:</b>
-        ${order.pdf_url ? `<a href="${order.pdf_url}" target="_blank">բացել</a>` : 'չկա'}
-      </p>
+      <p><b>PDF:</b> ${order.pdf_url ? `<a href="${order.pdf_url}" target="_blank">բացել</a>` : 'չկա'}</p>
 
       <hr>
 
@@ -166,10 +163,7 @@ function renderOrder(){
         Upload Preview
       </button>
 
-      <p>
-        <b>Preview:</b>
-        ${order.preview_url ? `<a href="${order.preview_url}" target="_blank">բացել</a>` : 'չկա'}
-      </p>
+      <p><b>Preview:</b> ${order.preview_url ? `<a href="${order.preview_url}" target="_blank">բացել</a>` : 'չկա'}</p>
 
       <hr>
 
@@ -216,18 +210,42 @@ async function uploadFile(bucket, inputId, column){
     return;
   }
 
-  const path = `order-${order.id}/${Date.now()}-${safeName(file.name)}`;
+  const fileName = `${Date.now()}-${safeName(file.name)}`;
+  const folder = `order-${order.id}`;
+  const path = `${folder}/${fileName}`;
+
+  console.log('UPLOAD START', { bucket, folder, fileName, path, file });
 
   const uploadResult = await aramazdClient.storage
     .from(bucket)
     .upload(path, file, {
       cacheControl: '3600',
-      upsert: false
+      upsert: true,
+      contentType: file.type || undefined
     });
+
+  console.log('UPLOAD RESULT', uploadResult);
 
   if(uploadResult.error){
     alert('Upload սխալ․ ' + uploadResult.error.message);
-    console.error(uploadResult.error);
+    return;
+  }
+
+  const listResult = await aramazdClient.storage
+    .from(bucket)
+    .list(folder);
+
+  console.log('LIST RESULT', listResult);
+
+  if(listResult.error){
+    alert('Storage list սխալ․ ' + listResult.error.message);
+    return;
+  }
+
+  const exists = (listResult.data || []).some(item => item.name === fileName);
+
+  if(!exists){
+    alert('Ֆայլը Storage-ում չգտնվեց upload-ից հետո');
     return;
   }
 
@@ -236,6 +254,8 @@ async function uploadFile(bucket, inputId, column){
     .getPublicUrl(path);
 
   const publicUrl = publicResult?.data?.publicUrl;
+
+  console.log('PUBLIC URL', publicUrl);
 
   if(!publicUrl){
     alert('Public URL չի ստեղծվել');
@@ -249,9 +269,10 @@ async function uploadFile(bucket, inputId, column){
     .select()
     .single();
 
+  console.log('DB UPDATE RESULT', updateResult);
+
   if(updateResult.error){
     alert('DB սխալ․ ' + updateResult.error.message);
-    console.error(updateResult.error);
     return;
   }
 
