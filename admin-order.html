@@ -203,13 +203,72 @@ function renderOrder(){
 }
 
 async function uploadFile(bucket,inputId,column){
-  const input=document.getElementById(inputId);
-  const file=input.files[0];
+  const input = document.getElementById(inputId);
+  const file = input?.files?.[0];
 
   if(!file){
     alert('Ընտրեք ֆայլը');
     return;
   }
+
+  if(!order || !order.id){
+    alert('Պատվերը չի գտնվել');
+    return;
+  }
+
+  const path = `order-${order.id}/${Date.now()}-${safeName(file.name)}`;
+
+  console.log('UPLOAD START', { bucket, inputId, column, path, file });
+
+  const uploadResult = await aramazdClient
+    .storage
+    .from(bucket)
+    .upload(path, file, {
+      cacheControl: '3600',
+      upsert: true
+    });
+
+  console.log('UPLOAD RESULT', uploadResult);
+
+  if(uploadResult.error){
+    alert('Upload սխալ․ ' + uploadResult.error.message);
+    return;
+  }
+
+  const publicResult = aramazdClient
+    .storage
+    .from(bucket)
+    .getPublicUrl(path);
+
+  console.log('PUBLIC URL RESULT', publicResult);
+
+  const publicUrl = publicResult?.data?.publicUrl;
+
+  if(!publicUrl){
+    alert('Public URL չի ստեղծվել');
+    return;
+  }
+
+  const updateResult = await aramazdClient
+    .from('orders')
+    .update({ [column]: publicUrl })
+    .eq('id', order.id)
+    .select()
+    .single();
+
+  console.log('DB UPDATE RESULT', updateResult);
+
+  if(updateResult.error){
+    alert('DB սխալ․ ' + updateResult.error.message);
+    return;
+  }
+
+  order = updateResult.data;
+
+  alert('Ֆայլը կցվեց ✅');
+
+  renderOrder();
+}
 
   const path=`order-${order.id}/${Date.now()}-${safeName(file.name)}`;
 
