@@ -76,7 +76,7 @@ function renderOrders(){
   <td><select id="status_${o.id}">
     ${['Նոր պատվեր','Տվյալները ստացվել են','Հեքիաթը գրվում է','Իլյուստրացիաների փուլ','Դիզայնի փուլ','Տպագրություն','Պատրաստ է','Առաքում','Առաքված','Ավարտված'].map(s=>`<option ${s===(o.status||'')?'selected':''}>${s}</option>`).join('')}
   </select></td>
-  <td><button class="mini-btn" onclick="saveOrder(${o.id})">Պահպանել</button></td>
+  <td><a class="mini-btn" href="admin-order.html?id=${o.id}">Բացել</a></td>
  </tr>`).join('') || '<tr><td colspan="7">Պատվերներ չկան</td></tr>';
 }
 async function saveOrder(id){
