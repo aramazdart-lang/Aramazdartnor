@@ -83,6 +83,7 @@ async function loadOrders(){
   renderDashboard();
   renderOrders();
   renderPayments();
+  renderLibrary();
 }
 
 function renderDashboard(){
@@ -174,6 +175,42 @@ function deliveryForm(o){
       <button onclick="demoFinalPayment(${o.id})">Վճարել մնացածը</button>
     </div>
   `;
+}
+
+function renderLibrary(){
+  const box=document.getElementById('libraryGrid');
+
+  if(!box) return;
+
+  const ready=userOrders.filter(o =>
+    o.pdf_url || o.video_url || o.nfc_url || o.preview_url
+  );
+
+  if(!ready.length){
+    box.innerHTML=`
+      <div class="file-card">
+        <div class="file-icon">📁</div>
+        <h3>Դեռ պատրաստ ֆայլեր չկան</h3>
+        <p>Երբ պատվերը ավարտվի և ֆայլերը կցվեն, դրանք կհայտնվեն այստեղ։</p>
+      </div>
+    `;
+    return;
+  }
+
+  box.innerHTML=ready.map(o=>`
+    <div class="file-card">
+      <div class="file-icon">📚</div>
+      <h3>${o.product}</h3>
+      <p>Պատվեր #AA-${o.id}</p>
+
+      ${o.preview_url?`<a class="btn small" target="_blank" href="${o.preview_url}">🖼 Preview</a>`:''}
+      ${o.pdf_url?`<a class="btn small" target="_blank" href="${o.pdf_url}">📖 Ներբեռնել PDF</a>`:''}
+      ${o.video_url?`<a class="btn small" target="_blank" href="${o.video_url}">🎬 Դիտել մուլտֆիլմը</a>`:''}
+      ${o.nfc_url?`<a class="btn small" target="_blank" href="${o.nfc_url}">📱 NFC հղում</a>`:''}
+
+      ${o.tracking_code?`<p><b>Tracking:</b> ${o.tracking_code}</p>`:''}
+    </div>
+  `).join('');
 }
 
 async function saveDelivery(id){
